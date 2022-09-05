@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'Util.dart';
 import 'gridview.dart';
@@ -90,7 +91,17 @@ class _WanAndroidAppState extends State<WanAndroidApp>
           actions: <Widget>[
             IconButton(
                 icon: Icon(Icons.search),
-                onPressed: () {
+                onPressed: () async{
+                  const platfrom=const MethodChannel("toJava");
+                  String returnValue = await platfrom.invokeMethod("张三");
+                  print("从原生Android的java方法返回的值是："+returnValue);
+
+
+                  const platfrom2=const MethodChannel("toJavaNum");
+                  String returnValue2 = await platfrom2.invokeMethod("张三");
+                  print("从原生Android的java方法返回的值是："+returnValue2);
+
+
                   navigatorKey.currentState!
                       .push(MaterialPageRoute(builder: (context) {
                     // return BookpagerPage();
