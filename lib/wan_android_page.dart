@@ -157,19 +157,51 @@ class _WanAndroidAppState extends State<WanAndroidApp>
     ///创建Dio对象
     Dio dio = new Dio();
     ///请求地址 获取用户列表
-    String url = "https://10.0.3.166:8020/cm/api";
-    // [{"event":"clientBehavior","behavior_id":"ccccc_10","timestamp":1662606826221},{"event":"clientBehavior","behavior_id":"ccccc_10","timestamp":1662604596424}]
-    Map<String, dynamic> map = Map();
-    map['event'] = "clientBehavior";
-    map['behavior_id'] = "ccccc_10";
-    map['timestamp'] = 1662606826221;
+    String url = "http://10.0.3.166:8020/cm/api";
+
+    // String url = "https://www.wanandroid.com/user/login";
+
     print("/发起get请求");
     ///发起get请求
-    Response response = await dio.post(url,data:map );
+    Response response = await dio.post(url,data: {"app_id":"10019","timestamp":"1662634482828","source":"1","nonce_str":"Ylni0ANX1HFvrpPH","data":[{"event":"interact_launch","mcc":460,"mnc":0,"timestamp":"1662633456440"}],"property":{"os":1,"device_id":"f62b56dcfa524384a86592b52eb46360","guid":"f62b56dc-fa52-4384-a865-92b52eb46360","user_id":"1234","ip":"","device_model":"xiaomi redmi note 8","brand":"xiaomi","carrier":"","sys_lang":"zh_CN","network_type":null,"app_lang":"en","sys_version":"28","app_version":"10","screen_width":1080,"screen_height":2130,"memory":"3.56","storage":"48.94","channel":"","package_name":"com.appsinnova.android.note"},"sign_type":"md5","sign":"F5A1A31B5981C449D516C63E3D3AFC5A"});
     ///响应数据
     var data = response.data.toString();
     print("请求结果 $data");
 
   }
+
+
+  void getRequestFunction2() async {
+    ///创建Dio对象
+    Dio dio = new Dio();
+    ///请求地址 获取用户列表
+    String url = "https://www.wanandroid.com/tree/json";
+    ///发起get请求
+    Response response = await dio.get(url);
+    ///响应数据
+    var data = response.data.toString();
+    print("请求结果 $data");
+
+
+  }
+
+
+
+  void getRequestFunction3() async {
+    String url = "https://www.wanandroid.com/user/login";
+    ///创建Dio
+    Dio dio = new Dio();
+    ///创建Map 封装参数
+    Map<String,dynamic> map = Map();
+    map['username']="admin";
+    map['password']="123456";
+    ///发起post请求
+    Response response =  await dio.post(url,data: {"username":"admin","password":"123456"});
+    var data = response.data.toString();
+    print("请求结果 $data");
+
+  }
+
+
 
 }
