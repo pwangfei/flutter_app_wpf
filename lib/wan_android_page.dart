@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -14,6 +15,8 @@ import 'bookDetailTitle.dart';
 import 'demo/DemoOne.dart';
 import 'BookDetailscorllview.dart';
 import 'BookpagerPage2.dart';
+
+import 'package:dio/dio.dart';
 
 //主页
 class WanAndroidApp extends StatefulWidget {
@@ -92,15 +95,19 @@ class _WanAndroidAppState extends State<WanAndroidApp>
             IconButton(
                 icon: Icon(Icons.search),
                 onPressed: () async{
-                  const platfrom=const MethodChannel("toJava");
-                  String returnValue = await platfrom.invokeMethod("张三");
-                  print("从原生Android的java方法返回的值是："+returnValue);
+                  // const platfrom=const MethodChannel("toJava");
+                  // String returnValue = await platfrom.invokeMethod("张三");
+                  // print("从原生Android的java方法返回的值是："+returnValue);
+                  //
+                  //
+                  // const platfrom2=const MethodChannel("toJavaNum");
+                  // String returnValue2 = await platfrom2.invokeMethod("张三");
+                  // print("从原生Android的java方法返回的值是："+returnValue2);
 
 
-                  const platfrom2=const MethodChannel("toJavaNum");
-                  String returnValue2 = await platfrom2.invokeMethod("张三");
-                  print("从原生Android的java方法返回的值是："+returnValue2);
 
+
+                  getRequestFunction1();
 
                   navigatorKey.currentState!
                       .push(MaterialPageRoute(builder: (context) {
@@ -116,19 +123,19 @@ class _WanAndroidAppState extends State<WanAndroidApp>
           items: <BottomNavigationBarItem>[
             BottomNavigationBarItem(
               icon: _tabIndex == 0 ? bookshelf2 : bookshelf1,
-              title: Text(appBarTitles[0]),
+              label:appBarTitles[0],
             ),
             BottomNavigationBarItem(
               icon: _tabIndex == 1 ? find2 : find1,
-              title: Text(appBarTitles[1]),
+              label: appBarTitles[1],
             ),
             BottomNavigationBarItem(
               icon: _tabIndex == 2 ? ranking2 : ranking1,
-              title: Text(appBarTitles[2]),
+              label: appBarTitles[2],
             ),
             BottomNavigationBarItem(
               icon: _tabIndex == 3 ? me2 : me1,
-              title: Text(appBarTitles[3]),
+              label: appBarTitles[3],
             ),
           ]
               .map((BottomNavigationBarItem navigationView) => navigationView)
@@ -145,4 +152,24 @@ class _WanAndroidAppState extends State<WanAndroidApp>
       ),
     );
   }
+
+  void getRequestFunction1() async {
+    ///创建Dio对象
+    Dio dio = new Dio();
+    ///请求地址 获取用户列表
+    String url = "https://10.0.3.166:8020/cm/api";
+    // [{"event":"clientBehavior","behavior_id":"ccccc_10","timestamp":1662606826221},{"event":"clientBehavior","behavior_id":"ccccc_10","timestamp":1662604596424}]
+    Map<String, dynamic> map = Map();
+    map['event'] = "clientBehavior";
+    map['behavior_id'] = "ccccc_10";
+    map['timestamp'] = 1662606826221;
+    print("/发起get请求");
+    ///发起get请求
+    Response response = await dio.post(url,data:map );
+    ///响应数据
+    var data = response.data.toString();
+    print("请求结果 $data");
+
+  }
+
 }

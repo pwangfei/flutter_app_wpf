@@ -33,9 +33,9 @@ class _ApplicationPageState extends State<ViewpagerPage> {
       ),
       bottomNavigationBar: new BottomNavigationBar(items: [
         BottomNavigationBarItem(
-            icon: new Icon(Icons.category), title: new Text("首页")),
+            icon: new Icon(Icons.category), label: "首页"),
         BottomNavigationBarItem(
-            icon: new Icon(Icons.message), title: new Text("我的")),
+            icon: new Icon(Icons.message), label: "我的"),
       ],
         currentIndex: _currentPageIndex,
         onTap: onTap,
