@@ -17,6 +17,14 @@ import 'BookDetailscorllview.dart';
 import 'BookpagerPage2.dart';
 
 import 'package:dio/dio.dart';
+import 'demo/PropertyData.dart';
+import 'demo/RepoerData.dart';
+import 'demo/BuriedData.dart';
+import 'dart:convert' as convert;
+
+
+import 'package:path/path.dart';
+import 'package:sqflite/sqflite.dart';
 
 //主页
 class WanAndroidApp extends StatefulWidget {
@@ -107,7 +115,8 @@ class _WanAndroidAppState extends State<WanAndroidApp>
 
 
 
-                  getRequestFunction1();
+                  // getRequestFunction1();
+                  openSqlite();
 
                   navigatorKey.currentState!
                       .push(MaterialPageRoute(builder: (context) {
@@ -154,19 +163,6 @@ class _WanAndroidAppState extends State<WanAndroidApp>
   }
 
   void getRequestFunction1() async {
-    ///创建Dio对象
-    Dio dio = new Dio();
-    ///请求地址 获取用户列表
-    String url = "http://10.0.3.166:8020/cm/api";
-
-    // String url = "https://www.wanandroid.com/user/login";
-
-    print("/发起get请求");
-    ///发起get请求
-    Response response = await dio.post(url,data: {"app_id":"10019","timestamp":"1662634482828","source":"1","nonce_str":"Ylni0ANX1HFvrpPH","data":[{"event":"interact_launch","mcc":460,"mnc":0,"timestamp":"1662633456440"}],"property":{"os":1,"device_id":"f62b56dcfa524384a86592b52eb46360","guid":"f62b56dc-fa52-4384-a865-92b52eb46360","user_id":"1234","ip":"","device_model":"xiaomi redmi note 8","brand":"xiaomi","carrier":"","sys_lang":"zh_CN","network_type":null,"app_lang":"en","sys_version":"28","app_version":"10","screen_width":1080,"screen_height":2130,"memory":"3.56","storage":"48.94","channel":"","package_name":"com.appsinnova.android.note"},"sign_type":"md5","sign":"F5A1A31B5981C449D516C63E3D3AFC5A"});
-    ///响应数据
-    var data = response.data.toString();
-    print("请求结果 $data");
 
   }
 
@@ -200,8 +196,69 @@ class _WanAndroidAppState extends State<WanAndroidApp>
     var data = response.data.toString();
     print("请求结果 $data");
 
+
   }
 
+  void openSqlite() async {
+
+    // 获取数据库 的位置
+    var databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, 'demo.db');
+    print("数据库的位置 $path");
+
+    // 删除数据库
+    // await deleteDatabase(path);
+
+    // 打开数据库
+    Database database = await openDatabase(path, version: 1,
+        onCreate: (Database db, int version) async {
+      // 创建数据库时，创建表
+      await db.execute(
+          'CREATE TABLE Test (id INTEGER PRIMARY KEY, name TEXT, value INTEGER, num REAL)');
+    });
 
 
+    // 在事务中插入一些记录
+    await database.transaction((txn) async {
+      int id1 = await txn.rawInsert(
+          'INSERT INTO Test(name, value, num) VALUES("some name", 1234, 456.789)');
+      print('inserted1: $id1');
+      int id2 = await txn.rawInsert(
+          'INSERT INTO Test(name, value, num) VALUES(?, ?, ?)',
+          ['another name', 12345678, 3.1416]);
+      print('inserted2: $id2');
+    });
+
+
+    // 更新一些记录
+    int count = await database.rawUpdate(
+        'UPDATE Test SET name = ?, value = ? WHERE name = ?',
+        ['updated name', '9876', 'some name']);
+    print('updated: $count');
+
+
+    // 获取记录
+    List<Map> list = await database.rawQuery('SELECT * FROM Test');
+    List<Map> expectedList = [
+      {'name': 'updated name', 'id': 1, 'value': 9876, 'num': 456.789},
+      {'name': 'another name', 'id': 2, 'value': 12345678, 'num': 3.1416}
+    ];
+    print(list);
+    print(expectedList);
+
+    // assert(const DeepCollectionEquality().equals(list, expectedList));
+
+    // 计算记录
+    var count1 = Sqflite.firstIntValue(await database.rawQuery('SELECT COUNT(*) FROM Test'));
+    assert(count1 == 2);
+
+    // Delete a record
+    count = await database
+        .rawDelete('DELETE FROM Test WHERE name = ?', ['another name']);
+    assert(count == 1);
+
+    //关闭数据库
+    await database.close();
+
+  }
 }
